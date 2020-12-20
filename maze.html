@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Follow the Light</title>
+</head>
+<style>
+    body{
+        font-family: monospace;
+        background-color:rgb(6, 40, 1);
+    }
+    #player{
+        width: 25px;
+        height: 25px;   
+        position: absolute;
+    }
+    #main{
+        width: 1200px;
+        height: 750px;
+    }
+    div{
+        background-color: black;
+    }
+    #arrow{
+        position:absolute;
+        width:100px;
+        margin-left:1210px;
+        margin-top:-40px;
+
+    }
+</style>
+<body>
+    <div id="main">
+        <img id="player" tabindex="0" src='player.png'>
+    </div>
+    <div id="main2"></div>
+    <p id="coords">--</p>
+    <img id="arrow" src="arrow.png">
+    <script>
+        //attributes
+        var playerX = 0;
+        var playerY = 0;
+        song = new Audio('isolation.mp3');
+        song.play();
+    
+        //2d array for background board
+        var rows = 48; var cols = 30;
+                var board = [
+                    [0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0],
+                    [1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0],
+                    [0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1],
+                    [0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1],
+                    [1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1],
+                    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 1],
+                    [0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0],
+                    [0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1],
+                    [0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1],
+                    [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1],
+                    [1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1],
+                    [1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1],
+                    [0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1],
+                    [0, 1, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0],
+                    [0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 0],
+                    [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0],
+                    [1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0],
+                    [0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0],
+                    [0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 0],
+                    [1, 1, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0],
+                    [0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1],
+                    [1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0],
+                    [0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1],
+                    [0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 0],
+                    [1, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0],
+                    [1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0],
+                    [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0],
+                    [1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1],
+                    [0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, , 0, 1, 0],
+                    [1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0],
+                    [1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0],
+                    [0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 1],
+                    [1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0],
+                    [1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0],
+                    [1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0],
+                    [0, 1, 0, 1, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0],
+                    [0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1],
+                    [0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                    [1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1],
+                    [1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 0],
+                    [0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1,  1, 1, 1, 1],
+                    [1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0],
+                    [1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0],
+                    [0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0],
+                    [1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0],
+                ];
+        //player
+        var main = document.getElementById("main");
+        document.getElementById("player").focus();
+        var player = document.getElementById("player");
+        player.onkeydown = move;
+    
+        //key movements
+        function move(e){
+            if(e.keyCode == '38'){//up
+                if(player.offsetTop >= main.offsetTop + 5 && board[playerX][playerY - 1] == 0){
+                        player.style.top = player.offsetTop - 25 + "px";
+                        playerY--;
+                }
+            }
+            else if (e.keyCode == '40'){//down
+                if(player.offsetTop <= main.offsetTop + 720 && board[playerX][playerY + 1] == 0){
+                    player.style.top = player.offsetTop + 25 + "px";
+                    playerY++;
+                }
+            }
+            else if (e.keyCode == '37'){//left
+                if(player.offsetLeft >= main.offsetLeft + 10 && board[playerX - 1][playerY] == 0){
+                    player.style.left = player.offsetLeft - 25 + "px";
+                    playerX--;
+                }
+            }
+            else if (e.keyCode == '39'){//right
+                if(player.offsetLeft <= main.offsetLeft + 1165 && board[playerX + 1][playerY] == 0){
+                    player.style.left = player.offsetLeft + 25 + "px";
+                    playerX++;
+                }
+            }
+            win();
+            document.getElementById("coords").innerHTML = playerX + " " + playerY;
+            visible();
+        }
+        //determine visibilty   
+        function visible(){
+            var node = document.getElementById('main2');
+            node.innerHTML = "";
+            if(board[playerX - 1][playerY - 1] != 0)    //nw
+                wall(-1, -1);              
+            if(board[playerX][playerY - 1] != 0)        //n      
+                wall(0, -1);    
+            if(board[playerX + 1][playerY - 1] != 0)    //ne
+                wall(1, -1);     
+            if(board[playerX - 1][playerY] != 0)        //w
+                wall(-1, 0);              
+            if(board[playerX + 1][playerY] != 0)        //e
+                wall(1, 0);         
+            if(board[playerX - 1][playerY + 1] != 0)    //sw
+                wall(-1, 1);              
+            if(board[playerX][playerY + 1] != 0)        //s
+                wall(0, 1);          
+            if(board[playerX + 1][playerY + 1] != 0)    //se
+                wall(1, 1);  
+            if(board[playerX - 2][playerY - 2] != 0)    //nnww
+                wall(-2, -2);  
+            if(board[playerX - 1][playerY - 2] != 0)    //nnw
+                wall(-1, -2);  
+            if(board[playerX][playerY - 2] != 0)        //nn
+                wall(0, -2);  
+            if(board[playerX + 1][playerY - 2] != 0)    //nne
+                wall(1, -2);  
+            if(board[playerX + 2][playerY - 2] != 0)    //nnee
+                wall(2, -2);  
+            if(board[playerX - 2][playerY - 1] != 0)    //nww
+                wall(-2, -1);  
+            if(board[playerX + 2][playerY - 1] != 0)    //nee
+                wall(2, -1);  
+            if(board[playerX - 2][playerY + 1] != 0)    //sww
+                wall(-2, 1);  
+            if(board[playerX + 2][playerY + 1] != 0)    //see
+                wall(2, 1);  
+            if(board[playerX - 2][playerY + 2] != 0)    //ssww
+                wall(-2, 2);  
+            if(board[playerX - 1][playerY + 2] != 0)    //ssw
+                wall(-1, 2);  
+            if(board[playerX][playerY + 2] != 0)        //ss
+                wall(0, 2);  
+            if(board[playerX + 1][playerY + 2] != 0)    //sse
+                wall(1, 2);  
+            if(board[playerX + 2][playerY + 2] != 0)    //ssee
+                wall(2, 2);  
+            if(board[playerX + 2][playerY] != 0)        //ee
+                wall(2, 0);  
+            if(board[playerX - 2][playerY] != 0)        //ww
+                wall(-2, 0);  
+        }
+        function wall(xOffset, yOffset){
+                var div = document.createElement("div");
+                    div.style.width = "25px";
+                    div.style.height = "25px";
+                    div.style.position = "absolute";
+                    div.style.left = (8 + 25 * xOffset) +  playerX * 25 +'px';
+                    div.style.top = (8 + 25 * yOffset) + playerY * 25 +'px';
+                    div.style.backgroundImage = "url('tree.png')";
+                    document.getElementById("main2").appendChild(div);   
+        }
+        function win(){
+            if(playerX == 47 && playerY == 29)
+                alert("You win!");   
+        }
+    </script>
+</body>
+</html>
